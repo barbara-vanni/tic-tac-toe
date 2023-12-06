@@ -4,7 +4,6 @@ from subprocess import BELOW_NORMAL_PRIORITY_CLASS
 import tkinter as tk
 from tkinter import *
 from PIL import Image, ImageTk
-from numpy import imag
 
 # Identifier les 9 cases de mon jeu
 grid = [["", "", ""], ["", "", ""], ["", "", ""]]
