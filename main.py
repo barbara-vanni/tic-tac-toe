@@ -1,9 +1,9 @@
 # coding: utf-8
 
-from subprocess import BELOW_NORMAL_PRIORITY_CLASS
 import tkinter as tk
 from tkinter import *
 from PIL import Image, ImageTk
+from ia import ia
 
 # Identifier les 9 cases de mon jeu
 grid = [["", "", ""], ["", "", ""], ["", "", ""]]
@@ -12,6 +12,7 @@ player = 1
 win_X=0
 win_Y=0
 tie = 0
+count = 0
 
 # Création et ouverture fenêtre tkinter
 window = tk.Tk()
@@ -26,13 +27,10 @@ message_frame.place(relx = 0.87,
                    rely = 0.26,
                    anchor = 's')
 # message_frame.grid(row=0, column=1)
- 
-
 message_frame.grid_rowconfigure(0, weight=1) 
 message_frame.grid_columnconfigure(0, weight=1)  
 
-# Variable pour compter le nombre de coups
-count = 0
+
 
 # images à la place du x et du o
 image_x = ImageTk.PhotoImage(Image.open("./assets/X_flamme.png"))
@@ -43,10 +41,10 @@ def on_button_click(row, col):
     global player, count
     if grid[row][col] == "" and count < 9:
         if player == 1:
-            image = image_o
+            image = image_x
             player = 2
         else:
-            image = image_x
+            image = image_o
             player = 1
 
         btn = tk.Button(center_frame, image=image, borderwidth=0, relief=tk.GROOVE, height=200, width=200,bg="white", cursor="heart")
@@ -54,6 +52,29 @@ def on_button_click(row, col):
         grid[row][col] = player  
         count += 1
         check_winner()
+
+        if player == 2 and count < 9:
+            ia_move = ia(grid, 2)
+            if ia_move is not False:
+                window.after(600, lambda: on_button_click(ia_move // 3, ia_move % 3))
+                # on_button_click(ia_move // 3, ia_move % 3)
+
+    print("État actuel du tableau de jeu : ", grid)
+    ia_move = ia(grid, 2)
+    print("Mouvement choisi par l'IA : ", ia_move)
+    print("Joueur actuel : ", player)
+    print("Nombre de mouvements effectués : ", count)
+
+
+
+# def ia_turn():
+#     global player, count
+#     if player == 2 and count < 9:
+#         ia_move = ia(grid, 2)
+#         if ia_move is not False:
+#             
+
+
 
 # combinaison gagnante 
 def check_winner():
@@ -187,10 +208,10 @@ start_button = tk.Button(window,image=photo, command=start_game)
 start_button.grid(row=0, column=0)
 
 # Bouton pour quitter
-quit_button = tk.Button(center_frame, text="Quit", command=window.destroy)
+quit_button = tk.Button(center_frame, text="__Quit__", command=window.destroy,borderwidth=2, relief=tk.FLAT, bg ='black',fg='white', font=('impact', 15), activebackground='white', activeforeground='black')
 
 # Bouton nouvelle partie
-new_game_button = tk.Button(center_frame, text="New Game", command=new_game)
+new_game_button = tk.Button(center_frame, text="__New Game__", command=new_game, borderwidth=2, relief=tk.GROOVE, bg ='black',fg='white', font=('impact', 15), activebackground='white', activeforeground='black')
 
 # Lancement de la boucle principale
 window.after(100, game_loop)
