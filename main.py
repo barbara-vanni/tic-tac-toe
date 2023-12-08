@@ -9,8 +9,8 @@ from ia import ia
 grid = [["", "", ""], ["", "", ""], ["", "", ""]]
 # Identifier les joueurs
 player = 1
-win_X=0
-win_Y=0
+win_X = 0
+win_Y = 0
 tie = 0
 count = 0
 
@@ -30,8 +30,6 @@ message_frame.place(relx = 0.87,
 message_frame.grid_rowconfigure(0, weight=1) 
 message_frame.grid_columnconfigure(0, weight=1)  
 
-
-
 # images à la place du x et du o
 image_x = ImageTk.PhotoImage(Image.open("./assets/X_flamme.png"))
 image_o = ImageTk.PhotoImage(Image.open("./assets/O_flamme.png"))
@@ -40,24 +38,23 @@ image_o = ImageTk.PhotoImage(Image.open("./assets/O_flamme.png"))
 def on_button_click(row, col):
     global player, count
     if grid[row][col] == "" and count < 9:
-        if player == 1:
+        if player == 2:
             image = image_x
-            player = 2
+            player = 1
         else:
             image = image_o
-            player = 1
+            player = 2
 
         btn = tk.Button(center_frame, image=image, borderwidth=0, relief=tk.GROOVE, height=200, width=200,bg="white", cursor="heart")
         btn.grid(row=row, column=col)
         grid[row][col] = player  
         count += 1
-        check_winner()
+        check_winner(grid)
 
         if player == 2 and count < 9:
             ia_move = ia(grid, 2)
             if ia_move is not False:
-                window.after(600, lambda: on_button_click(ia_move // 3, ia_move % 3))
-                # on_button_click(ia_move // 3, ia_move % 3)
+                window.after(400, on_button_click(row, col))
 
     print("État actuel du tableau de jeu : ", grid)
     ia_move = ia(grid, 2)
@@ -65,19 +62,7 @@ def on_button_click(row, col):
     print("Joueur actuel : ", player)
     print("Nombre de mouvements effectués : ", count)
 
-
-
-# def ia_turn():
-#     global player, count
-#     if player == 2 and count < 9:
-#         ia_move = ia(grid, 2)
-#         if ia_move is not False:
-#             
-
-
-
-# combinaison gagnante 
-def check_winner():
+def check_winner(grid):
     for x in range(3):
         # check pour les lignes et les colonnes 
         if grid[x][0] == grid[x][1] == grid[x][2] != "":
@@ -97,7 +82,7 @@ def check_winner():
 # Fonction pour vérifier s'il y a match nul
 def check_tie_game():
     global tie
-    if count == 9 and not check_winner():
+    if count == 9 and not check_winner(grid):
         msg = tk.Message(message_frame, text = "Match nul !")
         msg.config(font=('impact', 25), borderwidth=5, justify=CENTER)
         msg.grid()
@@ -129,8 +114,10 @@ def win(winner):
     current_message.config(font=('impact', 25), borderwidth=5, justify=CENTER)
     current_message.grid(row=0, column=0, pady=8)
     
-    update_scores()  # Mettre à jour les scores après chaque victoire
+    update_scores() 
     reset_game()
+
+
 
 # Création de la grille de jeu
 def create_board():
@@ -139,9 +126,9 @@ def create_board():
             btn = tk.Button(center_frame, text="", borderwidth=2, relief=tk.GROOVE, font=("Arial", 50), height=2, width=6, bg="white", fg="black", cursor="heart", command=lambda i=i, j=j: on_button_click(i, j))
             btn.grid(row=i, column=j)
 
+# fct pour nouvelle page 
 def show_game():
     create_board()
-
     quit_button.grid(row=4, column=0, columnspan=1, pady=10)
     new_game_button.grid(row=4, column=0, columnspan=10, pady=0)
 
@@ -155,7 +142,7 @@ def start_game():
 def new_game():
     # Effacer le contenu du message_frame
     for widget in message_frame.winfo_children():
-        # print(widget.winfo_class())
+        print(widget.winfo_class())
         widget.destroy()
 
 
@@ -185,10 +172,11 @@ def update_scores():
     label_X.config(text=f"Joueur X: {win_X}")
     label_Y.config(text=f"Joueur O: {win_Y}")
 
+# fonction d'actualisation pendant le jeu 
 def game_loop():
 
     check_tie_game()
-    check_winner()
+    check_winner(grid)
     update_scores()
     window.after(100, game_loop)# Appel récursif pour continuer la boucle
 
